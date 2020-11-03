@@ -13,3 +13,4 @@ export function sortStrings(arr, param = 'asc') {
     return result.sort((a, b) => -a.localeCompare(b, ['ru', 'en'], {caseFirst: 'upper'}));
   }
 }
+

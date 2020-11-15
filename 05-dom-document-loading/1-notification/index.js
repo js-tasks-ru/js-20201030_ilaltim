@@ -58,8 +58,8 @@ export default class NotificationMessage {
    */
 
     if (NotificationMessage.isShown) {
-      let elem = document.body.querySelector('.note');
-      elem.remove();
+      let elem = document.body.querySelectorAll('.note');
+      elem.forEach(el=> el.remove())
       document.body.append(this.element);
 
 

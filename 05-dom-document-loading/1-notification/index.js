@@ -7,18 +7,13 @@ export default class NotificationMessage {
    this.duration = duration;
    this.type = type;
   this.show();
-
  }
 
-
-
  show(...args) {
-
    if (args.length) {
      args[0].insertAdjacentHTML('afterbegin', this.element.outerHTML);
      return;
    }
-
 
    if (!NotificationMessage.elem) {
      const element = document.createElement('div');
@@ -35,8 +30,6 @@ export default class NotificationMessage {
      this.element = element.firstElementChild;
      NotificationMessage.elem = this.element;
      document.body.append(NotificationMessage.elem);
-
-
      setTimeout(()=> {
        this.remove();
      }
@@ -50,23 +43,12 @@ export default class NotificationMessage {
 
      this.show();
    }
-
-
-
-
-
-
-
-
-
  }
  remove() {
    this.element.remove();
  }
-
  destroy() {
    this.remove();
    //this.element = null;
  }
-
 }

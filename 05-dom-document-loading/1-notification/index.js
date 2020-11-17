@@ -41,7 +41,7 @@ export default class NotificationMessage {
      }
      , this.duration);
    }
-   else if (NotificationMessage.elem) {
+   else  {
      this.element = NotificationMessage.elem;
      this.remove();
      NotificationMessage.elem = null;

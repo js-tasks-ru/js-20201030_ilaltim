@@ -43,51 +43,49 @@ export default class SortableTable {
     }
     getTableBody(body) {
       return body.map(el => {
-        if (el.images) {
-          return ` <a href="/products/3d-ochki-optoma-zd301" class="sortable-table__row">
-        <div class="sortable-table__cell">
-          <img class="sortable-table-image" alt="${el.title}" src="${el.images[0].url}">
-          </div>
+        const url = el.images ? el.images[0].url : null;
+        return ` <a href="/products/3d-ochki-optoma-zd301" class="sortable-table__row">
+        ${el.images ? `<div class="sortable-table__cell"><img class="sortable-table-image" alt="Image" src="${url}"></div>` : ``}
         <div class="sortable-table__cell">${el.title}</div>
-
-        <div class="sortable-table__cell">${el.quantity}</div>
         <div class="sortable-table__cell">${el.price}</div>
+        <div class="sortable-table__cell">${el.quantity}</div>
         <div class="sortable-table__cell">${el.sales}</div>
       </a>`;
-        }
-        if (!el.images) {
-          return ` <a href="/products/3d-ochki-optoma-zd301" class="sortable-table__row">
-
-        <div class="sortable-table__cell">${el.title}</div>
-
-        <div class="sortable-table__cell">${el.price}</div>
-        <div class="sortable-table__cell">${el.price}</div>
-        <div class="sortable-table__cell">${el.price}</div>
-      </a>`;
-        }
-
       }).join('');
     }
-
-
 
     render() {
       const element = document.createElement('div');
       element.innerHTML = this.template;
       this.element = element.firstElementChild;
 
-       this.subElements.body = document.querySelector('.sortable-table__body');
+      this.subElements.body = document.querySelector('.sortable-table__body');
 
     }
 
-    sort(fieldValue, orderValue){
+    sort(fieldValue, orderValue) {
       const isSortable = this.header.find(el => el.id === fieldValue).sortable; //true false
       const sortType = this.header.find(el => el.id === fieldValue).sortType; //sting number
 
       if (!isSortable) {
         return ;
       }
-      if (sortType === 'number' && orderValue === 'asc') {
+      const direction = orderValue === 'asc' ? 1 : -1;
+
+      switch (sortType) {
+      case 'number':
+        this.data.sort((objA, objB) => {
+          return direction * (objA[fieldValue] - objB[fieldValue]);
+        });
+        break;
+
+      case "string":
+        this.data.sort((objA, objB) => {
+          return direction * (objA[fieldValue].localeCompare(objB[fieldValue], ['ru', 'en'], {caseFirst: 'upper'}));
+        });
+        break;
+      }
+      /*if (sortType === 'number' && orderValue === 'asc') {
         this.data.sort((objA, objB) =>{
           return objA[fieldValue] - objB[fieldValue];
         });
@@ -106,9 +104,9 @@ export default class SortableTable {
       if (sortType === 'string' && orderValue === 'desc') {
         this.data.sort((objA, objB) =>{
           return objB[fieldValue].localeCompare(objA[fieldValue], ['ru', 'en'], {caseFirst: 'upper'});
-        });
+        });*/
 
-      }
+
 
 
 

@@ -6,18 +6,12 @@ export default class NotificationMessage {
    this.message = message;
    this.duration = duration;
    this.type = type;
-  this.show();
+   this.show();
  }
 
- show(...args) {
-   if (args.length) {
-     args[0].insertAdjacentHTML('afterbegin', this.element.outerHTML);
-     return;
-   }
-
-   if (!NotificationMessage.elem) {
-     const element = document.createElement('div');
-     element.innerHTML = `
+ render() {
+   const element = document.createElement('div');
+   element.innerHTML = `
 <div class="notification ${this.type}" style="--value:${this.duration / 1000}s">
     <div class="timer"></div>
     <div class="inner-wrapper">
@@ -27,20 +21,30 @@ export default class NotificationMessage {
       </div>
     </div>
   </div>`;
-     this.element = element.firstElementChild;
+   this.element = element.firstElementChild;
+ }
+
+ show(...args) {
+   if (args.length) {
+     args[0].insertAdjacentHTML('afterbegin', this.element.outerHTML);
+     return;
+   }
+
+   if (!NotificationMessage.elem) {
+
+     this.render();
+
      NotificationMessage.elem = this.element;
      document.body.append(NotificationMessage.elem);
      setTimeout(()=> {
        this.remove();
      }
      , this.duration);
-     return ;
    }
-   else if(NotificationMessage.elem){
+   else if (NotificationMessage.elem) {
      this.element = NotificationMessage.elem;
      this.remove();
      NotificationMessage.elem = null;
-
      this.show();
    }
  }

@@ -26,7 +26,8 @@ export default class NotificationMessage {
 
  show(...args) {
    if (args.length) {
-     args[0].insertAdjacentHTML('afterbegin', this.element.outerHTML);
+
+     args[0].append(this.element)
      return;
    }
 

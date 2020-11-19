@@ -25,14 +25,15 @@ export default class SortableTable {
       let sortingOrder = null;
       let header = this.subElements.header;
       let body = this.subElements.body;
+      const arrowToRemove = element.querySelector('.sortable-table__sort-arrow');
 
       this.element.addEventListener('pointerdown', function (e) {
         let direction;
         //remove arrow
-        const ArrowToRemove = element.querySelector('.sortable-table__sort-arrow');
-        ArrowToRemove.remove();
+        arrowToRemove.remove();
         //add arrow to selected column
         const cell = e.target.closest('[data-id]') ? e.target.closest('[data-id]') : null;
+        if ( !cell ) return;
         cell.innerHTML = cell.innerHTML + `<span data-element="arrow" class="sortable-table__sort-arrow">
           <span class="sort-arrow"></span>
         </span>`;
@@ -55,7 +56,7 @@ export default class SortableTable {
         sortFn(sortBy, direction);
         //fill table body with actual data
         const tableBody = this.querySelector('.sortable-table__body');
-        tableBody.innerHTML = `${getBodyBody()}`;
+        tableBody.innerHTML = getBodyBody();
         header = element.querySelector('.sortable-table__header');
         body = element.querySelector('.sortable-table__body');
 

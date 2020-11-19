@@ -41,11 +41,11 @@ export default class SortableTable {
       return body.map(el => {
         const url = el.images ? el.images[0].url : null;
         return ` <a href="/products/3d-ochki-optoma-zd301" class="sortable-table__row">
-        ${el.images ? `<div class="sortable-table__cell"><img class="sortable-table-image" alt="Image" src="${url}"></div>` : ``}
-        <div class="sortable-table__cell">${el.title}</div>
-        <div class="sortable-table__cell">${el.price}</div>
-        <div class="sortable-table__cell">${el.quantity}</div>
-        <div class="sortable-table__cell">${el.sales}</div>
+        ${url && `<div class="sortable-table__cell"><img class="sortable-table-image" alt="Image" src="${url}"></div>`}
+        ${el.title && `<div class="sortable-table__cell">${el.title}</div>`}
+        ${el.quantity && `<div class="sortable-table__cell">${el.quantity}</div>`}
+        ${el.price && `<div class="sortable-table__cell">${el.price}</div>`}
+        ${el.sales && `<div class="sortable-table__cell">${el.sales}</div>`}
       </a>`;
       }).join('');
     }

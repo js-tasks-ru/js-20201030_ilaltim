@@ -12,17 +12,13 @@ export default class SortableTable {
       return `
         <div data-element="productsContainer" class="products-list__container">
   <div class="sortable-table">
-
     <div data-element="header" class="sortable-table__header sortable-table__row">
      ${this.getTableHeader(this.header)}
     </div>
     <div data-element="body" class="sortable-table__body">
      ${this.getTableBody(this.data)}
-
     </div>
-
     <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-
     <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
       <div>
         <p>No products satisfies your filter criteria</p>
@@ -58,9 +54,7 @@ export default class SortableTable {
       const element = document.createElement('div');
       element.innerHTML = this.template;
       this.element = element.firstElementChild;
-
       this.subElements.body = document.querySelector('.sortable-table__body');
-
     }
 
     sort(fieldValue, orderValue) {
@@ -85,31 +79,6 @@ export default class SortableTable {
         });
         break;
       }
-      /*if (sortType === 'number' && orderValue === 'asc') {
-        this.data.sort((objA, objB) =>{
-          return objA[fieldValue] - objB[fieldValue];
-        });
-
-      }
-      if (sortType === 'number' && orderValue === 'desc') {
-        this.data.sort((objA, objB) =>{
-          return objB[fieldValue] - objA[fieldValue];
-        });
-      }
-      if (sortType === 'string' && orderValue === 'asc') {
-        this.data.sort((objA, objB) =>{
-          return objA[fieldValue].localeCompare(objB[fieldValue], ['ru', 'en'], {caseFirst: 'upper'});
-        });
-      }
-      if (sortType === 'string' && orderValue === 'desc') {
-        this.data.sort((objA, objB) =>{
-          return objB[fieldValue].localeCompare(objA[fieldValue], ['ru', 'en'], {caseFirst: 'upper'});
-        });*/
-
-
-
-
-
       this.element.innerHTML = this.template;
       this.subElements.body = document.querySelector('.sortable-table__body');
     }
@@ -123,7 +92,3 @@ export default class SortableTable {
     //this.element = null;
     }
 }
-
-/*
-
- */

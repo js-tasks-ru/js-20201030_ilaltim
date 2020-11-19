@@ -17,36 +17,43 @@ export default class SortableTable {
       this.subElements.body = this.element.querySelector('.sortable-table__body');
 
     }
-    addListener(){
-      const element = this.element
+
+    addListener() {
+      const element = this.element;
       const sortFn = this.sort.bind(this);
       const getBodyBody = this.getBodyBody.bind(this);
       let sortingOrder = null;
-      let header =  this.subElements.header;
+      let header = this.subElements.header;
       let body = this.subElements.body;
+
       this.element.addEventListener('pointerdown', function (e) {
         let direction;
-        const deleteArrow = element.querySelector('.sortable-table__sort-arrow');
-        deleteArrow.remove();
-        const cell =  e.target.closest('[data-id]') ? e.target.closest('[data-id]') : null;
+        //remove arrow
+        const ArrowToRemove = element.querySelector('.sortable-table__sort-arrow');
+        ArrowToRemove.remove();
+        //add arrow to selected column
+        const cell = e.target.closest('[data-id]') ? e.target.closest('[data-id]') : null;
         cell.innerHTML = cell.innerHTML + `<span data-element="arrow" class="sortable-table__sort-arrow">
           <span class="sort-arrow"></span>
-        </span>`
-
+        </span>`;
+        //getting sorting field
         const sortBy = cell.dataset.id;
-        if(sortingOrder !== sortBy){
-          direction ='desc';
+        //check if desc sorting needed
+        //variable - sorting Order is indicator for this
+        if (sortingOrder !== sortBy) {
+          direction = 'desc';
           cell.dataset.order = 'desc';
           sortingOrder = sortBy;
-
+        //asc sorting if desc no needed.
         }
-        else if(sortingOrder === sortBy) {
+        else if (sortingOrder === sortBy) {
           direction = 'asc';
           cell.dataset.order = 'asc';
           sortingOrder = null;
         }
 
-        sortFn(sortBy,direction);
+        sortFn(sortBy, direction);
+        //fill table body with actual data
         const tableBody = this.querySelector('.sortable-table__body');
         tableBody.innerHTML = `${getBodyBody()}`;
         header = element.querySelector('.sortable-table__header');
@@ -76,7 +83,6 @@ export default class SortableTable {
       }
 
     }
-
 
     getTemplate() {
       return `
@@ -138,6 +144,7 @@ export default class SortableTable {
       </div>
     </div>`;
     }
+
     remove() {
       this.element.remove();
     }

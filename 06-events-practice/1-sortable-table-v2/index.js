@@ -19,15 +19,13 @@ export default class SortableTable {
     }
 
     addListener() {
-      const element = this.element;
-      const sortFn = this.sort.bind(this);
-      const getBodyBody = this.getBodyBody.bind(this);
+      const element = this.element; 
       let sortingOrder = null;
       let header = this.subElements.header;
       let body = this.subElements.body;
       const arrowToRemove = element.querySelector('.sortable-table__sort-arrow');
 
-      this.element.addEventListener('pointerdown', function (e) {
+      this.element.addEventListener('pointerdown',  (e) => {
         let direction;
         //remove arrow
         arrowToRemove.remove();
@@ -37,15 +35,11 @@ export default class SortableTable {
         cell.innerHTML = cell.innerHTML + `<span data-element="arrow" class="sortable-table__sort-arrow">
           <span class="sort-arrow"></span>
         </span>`;
-        //getting sorting field
         const sortBy = cell.dataset.id;
-        //check if desc sorting needed
-        //variable - sorting Order is indicator for this
         if (sortingOrder !== sortBy) {
           direction = 'desc';
           cell.dataset.order = 'desc';
           sortingOrder = sortBy;
-        //asc sorting if desc no needed.
         }
         else if (sortingOrder === sortBy) {
           direction = 'asc';
@@ -53,10 +47,9 @@ export default class SortableTable {
           sortingOrder = null;
         }
 
-        sortFn(sortBy, direction);
-        //fill table body with actual data
-        const tableBody = this.querySelector('.sortable-table__body');
-        tableBody.innerHTML = getBodyBody();
+        this.sort(sortBy, direction);
+        const tableBody = this.element.querySelector('.sortable-table__body');
+        tableBody.innerHTML = this.getBodyBody();
         header = element.querySelector('.sortable-table__header');
         body = element.querySelector('.sortable-table__body');
 

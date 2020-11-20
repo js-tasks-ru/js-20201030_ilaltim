@@ -24,10 +24,10 @@ export default class NotificationMessage {
    this.element = element.firstElementChild;
  }
 
- show(...args) {
-   if (args.length) {
+ show(root = document.body) {
 
-     args[0].append(this.element)
+   if (root !== document.body) {
+     root.append(this.element);
      return;
    }
 
@@ -42,7 +42,7 @@ export default class NotificationMessage {
      }
      , this.duration);
    }
-   else  {
+   else {
      this.element = NotificationMessage.elem;
      this.remove();
      NotificationMessage.elem = null;

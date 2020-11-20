@@ -1,7 +1,4 @@
 class Tooltip {
-  static linkToRenderFunc = null;
-  static linkDestroyFunc = null;
-  static linkOnMoveFunc = null;
 
   initialize() {
     let element = document.createElement('div');
@@ -15,9 +12,9 @@ class Tooltip {
 
   addListeners() {
     let render = this.render.bind(this);
-    Tooltip.linkToRenderFunc = render;
+    this.linkToRenderFunc = render;
     let destroy = this.remove.bind(this);
-    Tooltip.linkDestroyFunc = destroy;
+    this.linkDestroyFunc = destroy;
 
     document.body.addEventListener('pointerover', render);
     document.body.addEventListener('pointerout', destroy);
@@ -34,19 +31,19 @@ class Tooltip {
       this.element.innerHTML = `${e.target.dataset.tooltip}`;
     }
     let onMove = this.onMove.bind(this);
-    Tooltip.linkOnMoveFunc = this.onMove.bind(this);
+   this.linkOnMoveFunc = this.onMove.bind(this);
     document.body.addEventListener('pointermove', onMove);
     document.body.append(this.element);
   }
 
   remove() {
     this.element.remove();
-    document.body.removeEventListener('pointerout', Tooltip.linkDestroyFunc);
+    document.body.removeEventListener('pointerout', this.linkDestroyFunc);
   }
 
   destroy() {
-    document.body.removeEventListener('pointerover', Tooltip.linkToRenderFunc);
-    document.body.removeEventListener('pointermove', Tooltip.linkOnMoveFunc);
+    document.body.removeEventListener('pointerover', this.linkToRenderFunc);
+    document.body.removeEventListener('pointermove', this.linkOnMoveFunc);
     this.remove();
   }
 }

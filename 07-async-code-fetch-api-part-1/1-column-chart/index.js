@@ -5,12 +5,10 @@ export default class ColumnChart {
     url = '',
     label = '',
     range = {
-      from: '',
-      to: ''
+      from: new Date('2020-04-06'),
+      to: new Date('2020-05-06'),
 
     },
-
-
   } = {}) {
 
     this.data = [];
@@ -19,50 +17,56 @@ export default class ColumnChart {
     this.link = link;
     this.chartHeight = 50;
     this.url = url;
-    this.dateFrom = new Date('2020-04-06');
-    this.dateTo = new Date('2020-05-06');
+    this.dateFrom = range.from;
+    this.dateTo = range.to;
     this.update(this.dateFrom, this.dateTo);
-    this.render(this.data);
-
-
-
-
-
-
 
   }
 
   async update(from, to) {
-    const label = this.label;
+    if (!this.data.length) {
+      await this.render(this.data);
+      this.subElements = this.element.querySelector(`.column-chart__chart`);
+      this.subElements.body = this.subElements;
+      for (let i = 0 ; i < 31; i++) {
+        const div = document.createElement('div');
+        this.subElements.body.append(div);
+      }
+    }
     let url = `https://course-js.javascript.ru/${this.url}?from=${from}&to=${to}`;
     const response = await fetch(url);
     const result = await response.json();
-    const res = await new Array();
+    const res = [];
     await Object.values(result).map(el => res.push(el));
-    this.data = await new Array();
-    this.data = await res;
-    await this.remove();
-    await this.render(this.data);
-    const toAppend = await document.getElementById(`${this.label}`);
-    await toAppend.append(this.element);
+    this.data = res;
+    this.remove();
+    this.render(this.data);
+    const toAppend = document.getElementById(`${this.label}`);
 
+    if (!toAppend) {
+      this.subElements = this.element.querySelector(`.column-chart__chart`);
+      this.subElements.body = this.subElements;
 
+      for (let i = 0 ; i < 3; i++) {
+        if (this.subElements.body.children.length >= 3) {
+          return;
+        }
+        const div = document.createElement('div');
+        this.subElements.body.append(div);
+      }
+
+      return;
+    }
+    toAppend.append(this.element);
   }
 
   render(data) {
     const element = document.createElement('div');
     element.innerHTML = this.getTemplate(data);
     this.element = element.firstElementChild;
-    this.subElements = this.element.querySelector(`.column-chart__chart`);
-    this.subElements.body = this.subElements;
-    const { body } = this.subElements;
-    console.log(body.children);
-
-
-
   }
   getTemplate(data) {
-    if (!this.data.length) {
+    if (!data.length) {
       return `<div class="column-chart column-chart_loading" style="--chart-height: 50">
       <div class="column-chart__title">
         Total ${this.label}
@@ -78,6 +82,13 @@ export default class ColumnChart {
       </div>
     </div>`;
     }
+
+    let value = 0;
+    data.forEach(el => {
+      return value += el;
+    });
+    this.value = value;
+
     return `
       <div class="column-chart" style="--chart-height: ${this.chartHeight}">
       <div class="column-chart__${this.link}">
@@ -85,14 +96,13 @@ export default class ColumnChart {
         ${this.label === 'orders' && `<a href="/sales" class="column-chart__link">View all</a>` || ``}
       </div>
       <div class="column-chart__container">
-        <div data-element="header" class="column-chart__header">${this.value}</div>
+        <div data-element="header" class="column-chart__header">${this.label === 'sales' ? `$${this.value}` : this.value}</div>
         <div data-element="body" class="column-chart__chart">
           ${this.addColumnsToChart(data)}
         </div>
       </div>
     </div>`;
   }
-
 
   addColumnsToChart(data) {
     const maxValue = Math.max(...data);
@@ -103,12 +113,9 @@ export default class ColumnChart {
       const value = Math.floor(el * scale);
       return `<div style="--value: ${value}" data-tooltip="${percent}"></div>`;
     }).join('');
-
-
-
   }
 
-  async remove() {
+  remove() {
     this.element.remove();
   }
 

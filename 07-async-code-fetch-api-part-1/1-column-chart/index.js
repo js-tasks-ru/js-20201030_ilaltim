@@ -21,6 +21,7 @@ export default class ColumnChart {
     this.dateTo = range.to;
     this.update(this.dateFrom, this.dateTo);
 
+
   }
 
   async update(from, to) {
@@ -40,8 +41,9 @@ export default class ColumnChart {
     await Object.values(result).map(el => res.push(el));
     this.data = res;
     this.remove();
-    this.render(this.data);
+    await this.render(this.data);
     const toAppend = document.getElementById(`${this.label}`);
+
 
     if (!toAppend) {
       this.subElements = this.element.querySelector(`.column-chart__chart`);
@@ -60,7 +62,7 @@ export default class ColumnChart {
     toAppend.append(this.element);
   }
 
-  render(data) {
+  async render(data) {
     const element = document.createElement('div');
     element.innerHTML = this.getTemplate(data);
     this.element = element.firstElementChild;

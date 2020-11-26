@@ -1,13 +1,12 @@
 export default class RangePicker {
   element = {};
+
   constructor({from, to}) {
     this.from = from;
     this.to = to;
-    this.firstMonth = from.getMonth() + 1;
-    this.secondMonth = to.getMonth() + 1;
     this.selectionStart = from.getTime();
     this.selectionEnd = to.getTime();
-
+    this.clickOnRangePicker = 0;
     this.render();
     this.initListeners();
   }
@@ -21,20 +20,156 @@ export default class RangePicker {
       //получить вэлью ячейки
       else if (e.target.closest('.rangepicker__cell')) {
         console.log(e.target.dataset.value);
+
+        if (this.clickOnRangePicker === 0) {
+          this.clickOnRangePicker++;
+          console.log(`первый клик на ренджпиекре нужно 1 снять выделение со всех дат 2 выделить эту
+          ячейку Как фром 3 сохранить дату клика 4 увеличить каунтер на единицу'`);
+          this.turnoffHighLight(this.element);
+          this.hightLightCell(this.element, 'from', e);
+          this.firstClick = new Date(e.target.dataset.value);
+        } else if (this.clickOnRangePicker === 1) {
+
+          console.log(`это второй клик по ячейке по итогу нужно
+          сохранить все данные в зисе -
+          -выделить яейку как ТУ
+          -закрыть ренджпикер
+          - че то диспатчнуть
+          скинуть счетчик на 0`);
+          this.clickOnRangePicker = 0;
+          this.hightLightCell(this.element, 'to', e);
+          this.reselectSelectionRange(this.selectionStart, this.selectionEnd, this.firstClick, e);
+          this.closeRangePicker(this.element);
+          this.turnOnHighLight(this.element, this.selectionStart, this.selectionEnd);
+
+        }
       }
       //закрыть ренджПикер при клике не на селекторе
       else if (!e.target.closest('.rangepicker__selector')) {
         holder.firstElementChild.className = 'rangepicker';
       }
+      //перелистнуть на месяц вперед
+      else if (e.target.closest('.rangepicker__selector-control-right')) {
+        this.reselectFromTo(this.from, this.to, 1);
+        // изменить имена месяца в календаре
+        this.setMonthesNames(this.element, this.from, this.to);
+        // пересетать даты
+        this.setCalendarElements(this.element, this.from, this.to);
+
+
+      }
+      //перелистнуть на месяц назад
+      else if (e.target.closest('.rangepicker__selector-control-left')) {
+        this.reselectFromTo(this.from, this.to, -1);
+        this.setMonthesNames(this.element, this.from, this.to);
+        this.setCalendarElements(this.element, this.from, this.to);
+      }
     });
   }
+  //TODO доделать
+  turnOnHighLight(element, selectionStart,selectionEnd){
+    console.log(element);
+    console.log(selectionStart);
+    console.log(selectionEnd);
+   Array.from(element.querySelectorAll('.rangepicker__cell')).forEach(el => {
 
+   })  ;
+
+
+  }
+  closeRangePicker(element) {
+    element.className = 'rangepicker';
+  }
+  reselectSelectionRange(selectionStart, selectionEnd, firstClick, e) {
+    let leftBorder;
+    let rightBorder;
+    if (firstClick.getTime() < new Date(e.target.dataset.value).getTime()) {
+      leftBorder = firstClick.getTime();
+      rightBorder = new Date(e.target.dataset.value).getTime();
+    } else if (firstClick.getTime() > new Date(e.target.dataset.value).getTime()) {
+      leftBorder = new Date(e.target.dataset.value).getTime();
+      rightBorder = firstClick.getTime()
+    } else if (firstClick.getTime() === new Date(e.target.dataset.value).getTime()){
+      leftBorder = firstClick.getTime();
+      rightBorder = firstClick.getTime();
+    }
+    console.log(leftBorder)
+    console.log(rightBorder);
+    this.selectionStart = leftBorder;
+    this.selectionEnd = rightBorder;
+  }
+  hightLightCell(element, fromOrTo, e) {
+    e.target.className = `rangepicker__cell rangepicker__selected-${fromOrTo}`;
+  }
+  turnoffHighLight(element) {
+    element.querySelectorAll('.rangepicker__selected-between').forEach(el => el.className = 'rangepicker__cell');
+    element.querySelector('.rangepicker__selected-from').className = 'rangepicker__cell';
+    element.querySelector('.rangepicker__selected-to').className = 'rangepicker__cell';
+  }
+  setCalendarElements(element, from, to) {
+    let [firstMonth, secondMonth] = element.querySelectorAll('.rangepicker__date-grid');
+    //TODO заплонить этот массив в innerHTML вызваьб getMonthElementsGeneralMethod
+    firstMonth.innerHTML = this.getMonthElementsGeneralMethod(from, this.selectionStart, this.selectionEnd);
+    secondMonth.innerHTML = this.getMonthElementsGeneralMethod(to, this.selectionStart, this.selectionEnd);
+  }
+
+  getMonthElementsGeneralMethod (dateFromOrTo, selectionStart, selectionEnd) {
+
+    const numberOfDaysInMonth = new Date(dateFromOrTo.getFullYear(), dateFromOrTo.getMonth() + 1, 0).getDate();
+    let result = [];
+    for (let i = 1; i <= numberOfDaysInMonth; i++) {
+      if (i === 1) {
+
+        let todayTimeStamp = new Date(dateFromOrTo.getFullYear(), dateFromOrTo.getMonth(), i).getTime();
+        let addClassToStr = ``;
+        if (todayTimeStamp > selectionStart && todayTimeStamp < selectionEnd) {
+          addClassToStr = `rangepicker__selected-between`;
+        } else if (todayTimeStamp === selectionStart) {
+          addClassToStr = `rangepicker__selected-from`;
+        } else if (todayTimeStamp === selectionEnd) {
+          addClassToStr = `rangepicker__selected-to`;
+        }
+        let str = `<button type="button" class="rangepicker__cell ${addClassToStr}"
+    data-value="${dateFromOrTo.getFullYear()}-${dateFromOrTo.getMonth() + 1}-${i}T17:53:50.338Z"
+    style="--start-from: ${this.getIndexOfFirstDayInMonth(dateFromOrTo)}">${i}</button>`;
+        result.push(str);
+      } else {
+
+        let todayTimeStamp = new Date(dateFromOrTo.getFullYear(), dateFromOrTo.getMonth(), i).getTime();
+
+        let addClassToStr = ``;
+        if (todayTimeStamp > selectionStart && todayTimeStamp < selectionEnd) {
+          addClassToStr = `rangepicker__selected-between`;
+        } else if (todayTimeStamp === selectionStart) {
+          addClassToStr = `rangepicker__selected-from`;
+        } else if (todayTimeStamp === selectionEnd) {
+          addClassToStr = `rangepicker__selected-to`;
+        }
+
+        let str = `<button type="button" class="rangepicker__cell ${addClassToStr}"
+    data-value="${dateFromOrTo.getFullYear()}-${dateFromOrTo.getMonth() + 1}-${i}T17:53:50.338Z"
+    >${i}</button>`;
+        result.push(str);
+      }
+
+    }
+    return result.join('');
+  }
+  reselectFromTo(from, to, direction) {
+    this.from = new Date(from.getFullYear(), from.getMonth() + direction);
+    this.to = new Date(to.getFullYear(), to.getMonth() + direction);
+  }
+  setMonthesNames(element, from, to) {
+    const [first, second] = this.element.querySelectorAll('.rangepicker__month-indicator');
+
+    first.innerHTML = `<time datetime="${this.getMonthName(from.getMonth())}">${this.getMonthName(from.getMonth())}</time>`;
+    second.innerHTML = `<time datetime="${this.getMonthName(to.getMonth())}">${this.getMonthName(to.getMonth())}</time>`;
+  }
   render() {
-
     const element = document.createElement('div');
     element.innerHTML = this.getTemplate();
     this.element = element.firstElementChild;
-    console.log(this.element);
+
   }
 
   getMonthName(monthIndex) {
@@ -76,22 +211,48 @@ export default class RangePicker {
     }
     return indexOfFirstDay;
   }
-  getMonthElements(monthObject , selectionStart, selectionEnd ) {
+  getSpanInner(selection) {
+    return `${new Date(selection).getDate() < 10 ?
+      `0${new Date(selection).getDate()}` :
+      new Date(selection).getDate()}
+        .${new Date(selection).getMonth() + 1 < 10 ?
+    `0${new Date(selection).getMonth() + 1 }` :
+    new Date(selection).getMonth() + 1
+}.${new Date(selection).getFullYear()}`;
+  }
+  getMonthElements(monthObject, selectionStart, selectionEnd) {
 
     let result = [];
     for (let i = 1; i <= monthObject.numberOfDaysInMonth; i++) {
       if (i === 1) {
-        let todayTimeStamp = new Date(monthObject.year,monthObject.month-1, i).getTime();
+        let todayTimeStamp = new Date(monthObject.year, monthObject.month - 1, i).getTime();
 
-        let str = `<button type="button" class="rangepicker__cell ${todayTimeStamp >= selectionStart && todayTimeStamp <= selectionEnd ? ` rangepicker__selected-between` : ``}"
+        let addClassToStr = ``;
+        if (todayTimeStamp > selectionStart && todayTimeStamp < selectionEnd) {
+          addClassToStr = `rangepicker__selected-between`;
+        } else if (todayTimeStamp === selectionStart) {
+          addClassToStr = `rangepicker__selected-from`;
+        } else if (todayTimeStamp === selectionEnd) {
+          addClassToStr = `rangepicker__selected-to`;
+        }
+        let str = `<button type="button" class="rangepicker__cell ${addClassToStr}"
     data-value="${monthObject.year}-${monthObject.month}-${i}T17:53:50.338Z"
     style="--start-from: ${monthObject.indexOfFirstDay}">${i}</button>`;
         result.push(str);
-      }else {
-        let todayTimeStamp = new Date(monthObject.year,monthObject.month-1, i).getTime();
-        let str = `<button type="button" class="rangepicker__cell ${todayTimeStamp >= selectionStart && todayTimeStamp <= selectionEnd ? ` rangepicker__selected-between` : ``}"
+      } else {
+        let todayTimeStamp = new Date(monthObject.year, monthObject.month - 1, i).getTime();
+
+        let addClassToStr = ``;
+        if (todayTimeStamp > selectionStart && todayTimeStamp < selectionEnd) {
+          addClassToStr = `rangepicker__selected-between`;
+        } else if (todayTimeStamp === selectionStart) {
+          addClassToStr = `rangepicker__selected-from`;
+        } else if (todayTimeStamp === selectionEnd) {
+          addClassToStr = `rangepicker__selected-to`;
+        }
+        let str = `<button type="button" class="rangepicker__cell ${addClassToStr}"
     data-value="${monthObject.year}-${monthObject.month}-${i}T17:53:50.338Z"
-    style="--start-from: ${monthObject.indexOfFirstDay}">${i}</button>`;
+    >${i}</button>`;
         result.push(str);
       }
 
@@ -108,6 +269,7 @@ export default class RangePicker {
       numberOfDaysInMonth: new Date(this.from.getFullYear(), this.from.getMonth() + 1, 0).getDate(),
       indexOfFirstDay: this.getIndexOfFirstDayInMonth(this.from),
     };
+
     firstMonth.elements = this.getMonthElements(firstMonth, this.selectionStart, this.selectionEnd);
 
 
@@ -125,8 +287,8 @@ export default class RangePicker {
 
     return `<div class="rangepicker">
     <div class="rangepicker__input" data-element="input">
-      <span data-element="from">${firstMonth.date}/${firstMonth.month}/${firstMonth.year}</span> -
-      <span data-element="to">${secondMonth.date}/${secondMonth.month}/${secondMonth.year}</span>
+      <span data-element="from">${this.getSpanInner(this.selectionStart)}</span> -
+      <span data-element="to">${this.getSpanInner(this.selectionEnd)}</span>
     </div>
     <div class="rangepicker__selector" data-element="selector">
       <div class="rangepicker__selector-arrow"></div>

@@ -308,6 +308,7 @@ export default class RangePicker {
   getTemplate() {
 
     let firstMonth = {
+
       date: this.from.getDate() < 10 ? `0${this.from.getDate()}` : this.from.getDate(),
       month: this.from.getMonth() + 1 < 10 ? `0${this.from.getMonth() + 1}` : this.from.getMonth() + 1,
       year: this.from.getFullYear(),

@@ -17,14 +17,12 @@ export default class Page {
   }
 
     onDateSelect = async(e) => {
-      //TODO по аналогии доделать остальные преобразования и в конце концов объединить
-      //их в промисОлл
+      //TODO сделать update всем чартам . range берется из ивента
       const orderPromise = this.ordersChartObj.update(e.detail.from, e.detail.to);
       const salesPromise = this.salesChartObj.update(e.detail.from, e.detail.to);
       const customersPromise = this.customersChartObj.update(e.detail.from, e.detail.to);
-      //TODO нужно получить объект дата при помощи запроса на сервер и установить его в
-      //this.data сортаблТейбл
-      //если добавить результат как аргумент для апдейт
+      //TODO нужно получить массив с новыми элементами для sortableTable при помощи запроса на сервер
+      //создание url для запроса
       const url = new URL(`https://course-js.javascript.ru/api/dashboard/bestsellers`);
       url.searchParams.set('from', e.detail.from.toISOString());
       url.searchParams.set('to', e.detail.to.toISOString());
@@ -33,9 +31,12 @@ export default class Page {
       url.searchParams.set('_start', `0`);
       url.searchParams.set('_end', `20`);
 
-      const newDataPromise = fetchJson(url);
-      await Promise.all([orderPromise, salesPromise, customersPromise, newDataPromise]);
-      this.sortableTableObj.update(newDataPromise);
+
+      const newData = await fetchJson(url);
+      //TODO объединить все запросы в Promise.all
+      await Promise.all([orderPromise, salesPromise, customersPromise]);
+      //TODO обновить элемент сортаблТейбл.
+      this.sortableTableObj.update(newData);
     }
 
     initEventListeners() {

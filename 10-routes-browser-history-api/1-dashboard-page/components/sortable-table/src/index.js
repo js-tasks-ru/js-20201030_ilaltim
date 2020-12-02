@@ -128,7 +128,7 @@ export default class SortableTable {
 
     this.data = [...this.data, ...data];
     rows.innerHTML = this.getTableRows(data);
-
+    this.subElements.body.innerHTML = ``;
     this.subElements.body.append(...rows.childNodes);
   }
 

@@ -8,24 +8,35 @@ import fetchJson from './utils/fetch-json.js';
 const BACKEND_URL = 'https://course-js.javascript.ru/';
 const TODAY = new Date();
 const PREV_MONTH = new Date(TODAY.getFullYear(), TODAY.getMonth() - 1, TODAY.getDate() + 1);
-const EXPEREMENTAL_DATE = new Date(TODAY.getFullYear(), TODAY.getMonth() - 1, TODAY.getDate() + 5);
+
 export default class Page {
 
   constructor() {
-    console.log('new page constructor');
     this.initEventListeners();
     this.render();
   }
 
     onDateSelect = async(e) => {
-      console.log(e);
-      console.log(new Date(e.detail.from.toISOString()));
-      console.log(new Date(e.detail.to.toISOString()));
-      console.log(e.target);
       //TODO по аналогии доделать остальные преобразования и в конце концов объединить
       //их в промисОлл
-      await this.mainchart.update(e.detail.from,e.detail.to);
+      await this.ordersChartObj.update(e.detail.from,e.detail.to);
+      await this.salesChartObj.update(e.detail.from,e.detail.to);
+      await this.customersChartObj.update(e.detail.from,e.detail.to);
+      //TODO нужно получить объект дата при помощи запроса на сервер и установить его в
+      //this.data сортаблТейбл
+      //если добавить результат как аргумент для апдейт
+      const url = new URL(`https://course-js.javascript.ru/api/dashboard/bestsellers`);
+      url.searchParams.set('from', e.detail.from.toISOString());
+      url.searchParams.set('to', e.detail.to.toISOString());
+      url.searchParams.set('_sort', 'price');
+      url.searchParams.set('_order', 'asc');
+      url.searchParams.set('_start', `0`);
+      url.searchParams.set('_end', `20`);
+
+      const newData = await fetchJson(url);
+      await this.sortableTableObj.update(newData);
     }
+
     initEventListeners() {
       document.addEventListener('date-select', this.onDateSelect);
 
@@ -42,19 +53,23 @@ export default class Page {
         url: `${BACKEND_URL}api/dashboard/orders`,
         range: {from: PREV_MONTH, to: TODAY}
       });
-      this.mainchart = ordersChart;
+      this.ordersChartObj = ordersChart;
+
       const salesChart = new ColumnChart({
         label: 'sales',
         formatHeading: data => data,
         url: `${BACKEND_URL}api/dashboard/sales`,
         range: {from: PREV_MONTH, to: TODAY}
       });
+      this.salesChartObj = salesChart;
       const customersChart = new ColumnChart({
         label: 'customers',
         formatHeading: data => data,
         url: `${BACKEND_URL}api/dashboard/customers`,
         range: {from: PREV_MONTH, to: TODAY}
       });
+      this.customersChartObj = customersChart;
+
       const sortableTable = new SortableTable(header, {
         url: `api/dashboard/bestsellers`,
         sorted: {
@@ -64,9 +79,8 @@ export default class Page {
         isSortLocally: true,
         step: 20,
         start: 1,
-        end: 21
-
       });
+      this.sortableTableObj = sortableTable;
 
 
       element.append(rangePicker.element);
@@ -82,7 +96,6 @@ export default class Page {
       this.subElements.ordersChart = ordersChart.element;
       this.subElements.salesChart = salesChart.element;
       this.subElements.customersChart = customersChart.element;
-      console.log(this.element);
       return this.element;
 
     }
@@ -91,5 +104,7 @@ export default class Page {
     }
     destroy(){
       this.remove();
+      document.removeEventListener('date-select', this.onDateSelect);
     }
+
 }

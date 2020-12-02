@@ -11,6 +11,31 @@ export default class SortableTable {
   start = 1;
   end = this.start + this.step;
 
+
+  constructor(headersConfig = [], {
+    url = '',
+    sorted = {
+      id: headersConfig.find(item => item.sortable).id,
+      order: 'asc'
+    },
+    isSortLocally = false,
+    step = 20,
+    start = 1,
+    end = start + step
+  } = {}) {
+
+    this.headersConfig = headersConfig;
+    this.url = new URL(url, BACKEND_URL);
+    this.sorted = sorted;
+    this.isSortLocally = isSortLocally;
+    this.step = step;
+    this.start = start;
+    this.end = end;
+
+    this.render();
+  }
+
+
   onWindowScroll = async() => {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
@@ -59,28 +84,6 @@ export default class SortableTable {
     }
   };
 
-  constructor(headersConfig = [], {
-    url = '',
-    sorted = {
-      id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
-    },
-    isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
-  } = {}) {
-
-    this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
-    this.sorted = sorted;
-    this.isSortLocally = isSortLocally;
-    this.step = step;
-    this.start = start;
-    this.end = end;
-
-    this.render();
-  }
 
   async render() {
     const {id, order} = this.sorted;

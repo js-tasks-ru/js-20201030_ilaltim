@@ -19,9 +19,9 @@ export default class Page {
     onDateSelect = async(e) => {
       //TODO по аналогии доделать остальные преобразования и в конце концов объединить
       //их в промисОлл
-      await this.ordersChartObj.update(e.detail.from,e.detail.to);
-      await this.salesChartObj.update(e.detail.from,e.detail.to);
-      await this.customersChartObj.update(e.detail.from,e.detail.to);
+      const orderPromise = this.ordersChartObj.update(e.detail.from, e.detail.to);
+      const salesPromise = this.salesChartObj.update(e.detail.from, e.detail.to);
+      const customersPromise = this.customersChartObj.update(e.detail.from, e.detail.to);
       //TODO нужно получить объект дата при помощи запроса на сервер и установить его в
       //this.data сортаблТейбл
       //если добавить результат как аргумент для апдейт
@@ -33,8 +33,9 @@ export default class Page {
       url.searchParams.set('_start', `0`);
       url.searchParams.set('_end', `20`);
 
-      const newData = await fetchJson(url);
-      await this.sortableTableObj.update(newData);
+      const newDataPromise = fetchJson(url);
+      await Promise.all([orderPromise, salesPromise, customersPromise, newDataPromise]);
+      this.sortableTableObj.update(newDataPromise);
     }
 
     initEventListeners() {
@@ -99,10 +100,10 @@ export default class Page {
       return this.element;
 
     }
-    remove (){
-    this.element.remove();
+    remove () {
+      this.element.remove();
     }
-    destroy(){
+    destroy() {
       this.remove();
       document.removeEventListener('date-select', this.onDateSelect);
     }

@@ -127,7 +127,15 @@ export default class SortableTable {
     const rows = document.createElement('div');
 
     this.data = [...this.data, ...data];
+    this.subElements.body.append(...rows.childNodes);
+  }
+  updateFuncForDashboardPage(data) {
+    const rows = document.createElement('div');
+
+    this.data = [...this.data, ...data];
     rows.innerHTML = this.getTableRows(data);
+    //TODO следующая строчка(133) this.subElements.body.innerHTML = ``; была добавлена мной для реализации страницы dashboard
+    //TODO возможно она помешает мне в будущем
     this.subElements.body.innerHTML = ``;
     this.subElements.body.append(...rows.childNodes);
   }

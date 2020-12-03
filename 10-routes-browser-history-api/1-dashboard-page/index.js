@@ -36,7 +36,7 @@ export default class Page {
       //TODO объединить все запросы в Promise.all
       await Promise.all([orderPromise, salesPromise, customersPromise]);
       //TODO обновить элемент сортаблТейбл.
-      this.sortableTableObj.update(newData);
+      this.sortableTableObj.updateFuncForDashboardPage(newData);
     }
 
     initEventListeners() {
@@ -46,8 +46,9 @@ export default class Page {
 
     async render() {
       const element = document.createElement('div');
+      //TODO create rangePicker element
       const rangePicker = new RangePicker({from: PREV_MONTH, to: TODAY});
-
+      //TODO create orderChat element
       const ordersChart = new ColumnChart({
         label: 'orders',
         link: `View all`,
@@ -56,7 +57,7 @@ export default class Page {
         range: {from: PREV_MONTH, to: TODAY}
       });
       this.ordersChartObj = ordersChart;
-
+      //TODO create salesChat element
       const salesChart = new ColumnChart({
         label: 'sales',
         formatHeading: data => data,
@@ -64,6 +65,7 @@ export default class Page {
         range: {from: PREV_MONTH, to: TODAY}
       });
       this.salesChartObj = salesChart;
+      //TODO create customersChat element
       const customersChart = new ColumnChart({
         label: 'customers',
         formatHeading: data => data,
@@ -71,7 +73,7 @@ export default class Page {
         range: {from: PREV_MONTH, to: TODAY}
       });
       this.customersChartObj = customersChart;
-
+      //TODO create sortableTable element
       const sortableTable = new SortableTable(header, {
         url: `api/dashboard/bestsellers`,
         sorted: {
@@ -83,23 +85,48 @@ export default class Page {
         start: 1,
       });
       this.sortableTableObj = sortableTable;
-
-
-      element.append(rangePicker.element);
-      element.append(ordersChart.element);
-      element.append(salesChart.element);
-      element.append(customersChart.element);
-      element.append(sortableTable.element);
-
       this.element = element;
+
+      //TODO save subElements links
       this.subElements = {};
       this.subElements.sortableTable = sortableTable.element;
       this.subElements.rangePicker = rangePicker.element;
       this.subElements.ordersChart = ordersChart.element;
       this.subElements.salesChart = salesChart.element;
       this.subElements.customersChart = customersChart.element;
+      const content = document.getElementById('#content');
+      //TODO get html template
+      this.element.innerHTML = this.getTemplate();
+      //TODO append rangePicker
+      const rangePickerCotainer = this.element.querySelector('.content__top-panel');
+      rangePickerCotainer.append(rangePicker.element);
+      //TODO append charts
+      this.element.querySelector('.dashboard__chart_orders').append(ordersChart.element);
+      this.element.querySelector('.dashboard__chart_sales').append(salesChart.element);
+      this.element.querySelector('.dashboard__chart_customers').append(customersChart.element);
+      //TODO append sortableTable
+      this.element.querySelector('.dashboard').append(sortableTable.element);
+
       return this.element;
 
+    }
+
+    getTemplate() {
+      return `<div class="dashboard">
+           <div class="content__top-panel">
+           <h2 class="page-title">Dashboard</h2>
+           <div data-element="rangePicker"></div>
+</div>
+    <div data-element="chartsRoot" class="dashboard__charts">
+    <div data-element="ordersChart" class="dashboard__chart_orders"></div>
+    <div data-element="salesChart" class="dashboard__chart_sales"></div>
+    <div data-element="customersChart" class="dashboard__chart_customers"></div>
+</div>
+    <h3 class="block-title">Best sellers</h3>
+    <div data-element="sortableTable">
+
+</div>
+</div>`;
     }
     remove () {
       this.element.remove();

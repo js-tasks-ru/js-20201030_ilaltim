@@ -57,8 +57,8 @@ export default class ColumnChart {
     if (data && Object.values(data).length) {
       this.subElements.header.textContent = this.getHeaderValue(data);
       this.subElements.body.innerHTML = this.getColumnBody(data);
-
       this.element.classList.remove('column-chart_loading');
+
     }
   }
 

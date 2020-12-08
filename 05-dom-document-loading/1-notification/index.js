@@ -8,7 +8,6 @@ export default class NotificationMessage {
    this.type = type;
    this.show();
  }
-
  render() {
    const element = document.createElement('div');
    element.innerHTML = `

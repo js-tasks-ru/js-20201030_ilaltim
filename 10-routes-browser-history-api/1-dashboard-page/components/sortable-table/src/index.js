@@ -11,6 +11,31 @@ export default class SortableTable {
   start = 1;
   end = this.start + this.step;
 
+
+  constructor(headersConfig = [], {
+    url = '',
+    sorted = {
+      id: headersConfig.find(item => item.sortable).id,
+      order: 'asc'
+    },
+    isSortLocally = false,
+    step = 20,
+    start = 1,
+    end = start + step
+  } = {}) {
+
+    this.headersConfig = headersConfig;
+    this.url = new URL(url, BACKEND_URL);
+    this.sorted = sorted;
+    this.isSortLocally = isSortLocally;
+    this.step = step;
+    this.start = start;
+    this.end = end;
+
+    this.render();
+  }
+
+
   onWindowScroll = async() => {
     const { bottom } = this.element.getBoundingClientRect();
     const { id, order } = this.sorted;
@@ -59,28 +84,6 @@ export default class SortableTable {
     }
   };
 
-  constructor(headersConfig = [], {
-    url = '',
-    sorted = {
-      id: headersConfig.find(item => item.sortable).id,
-      order: 'asc'
-    },
-    isSortLocally = false,
-    step = 20,
-    start = 1,
-    end = start + step
-  } = {}) {
-
-    this.headersConfig = headersConfig;
-    this.url = new URL(url, BACKEND_URL);
-    this.sorted = sorted;
-    this.isSortLocally = isSortLocally;
-    this.step = step;
-    this.start = start;
-    this.end = end;
-
-    this.render();
-  }
 
   async render() {
     const {id, order} = this.sorted;
@@ -124,8 +127,16 @@ export default class SortableTable {
     const rows = document.createElement('div');
 
     this.data = [...this.data, ...data];
-    rows.innerHTML = this.getTableRows(data);
+    this.subElements.body.append(...rows.childNodes);
+  }
+  updateFuncForDashboardPage(data) {
+    const rows = document.createElement('div');
 
+    this.data = [...this.data, ...data];
+    rows.innerHTML = this.getTableRows(data);
+    //TODO следующая строчка(133) this.subElements.body.innerHTML = ``; была добавлена мной для реализации страницы dashboard
+    //TODO возможно она помешает мне в будущем
+    this.subElements.body.innerHTML = ``;
     this.subElements.body.append(...rows.childNodes);
   }
 
